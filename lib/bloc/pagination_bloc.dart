@@ -11,7 +11,6 @@ part 'pagination_state.dart';
 
 abstract class PaginationResponseData<T> {
   /// метод для запроса получения айтемов
-  Future<List<T>> getItems();
 }
 
 abstract class PaginationPages {
@@ -30,6 +29,7 @@ abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T
     }, transformer: droppable());
   }
 
+  Future<List<T>> getItems(_page);
   bool _isLastPage = false;
   late List<T> _items;
 

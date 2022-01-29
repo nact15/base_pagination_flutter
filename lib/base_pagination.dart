@@ -11,7 +11,7 @@ typedef PlaceholderBuilder = Widget Function(BuildContext, int);
 
 typedef ItemBuilder = Widget Function(BuildContext, int);
 
-class Pagination extends StatefulWidget {
+class Pagination<T> extends StatefulWidget {
   final ItemBuilder itemBuilder;
   final bool shrinkWrap;
   final Widget loader;
@@ -50,10 +50,10 @@ class Pagination extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _PaginationState createState() => _PaginationState();
+  _PaginationState createState() => _PaginationState<T>();
 }
 
-class _PaginationState extends State<Pagination> {
+class _PaginationState<T> extends State<Pagination> {
   late ScrollController _scrollController;
   late ScrollPhysics _physics;
   late SliverGridDelegateWithFixedCrossAxisCount _gridDelegate;
@@ -83,7 +83,7 @@ class _PaginationState extends State<Pagination> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<PaginationBloc, PaginationState>(
+    return BlocConsumer<PaginationBloc<T>, PaginationState<T>>(
       listenWhen: (_, state) => !state.build,
       listener: (context, state) {},
       buildWhen: (_, state) => state.build,
