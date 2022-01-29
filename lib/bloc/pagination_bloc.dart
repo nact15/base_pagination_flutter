@@ -19,7 +19,7 @@ abstract class PaginationPages {
 
 abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T>>
     implements PaginationPages, PaginationResponseData<T> {
-  PaginationBloc() : super(const PaginationState(status: PaginationStatus.initial)) {
+  PaginationBloc() : super(const PaginationState<T>(status: PaginationStatus.initial)) {
     on<PaginationFetch>(_onPaginationFetch, transformer: droppable());
     on<PaginationRefresh>((event, emit) {
       _isLastPage = false;
@@ -30,16 +30,17 @@ abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T
   }
 
   Future<List<T>> getItems(_page);
+
   bool _isLastPage = false;
   late List<T> _items;
 
   int _page = 1;
 
-  Future<FutureOr<void>> _onPaginationFetch(_, Emitter<PaginationState> emit) async {
+  Future<FutureOr<void>> _onPaginationFetch(_, Emitter<PaginationState<T>> emit) async {
     try {
       if (_page == 1) {
         _items = [];
-        emit(const PaginationState(status: PaginationStatus.loading));
+        emit(PaginationState<T>(status: PaginationStatus.loading));
       }
       if (!_isLastPage) {
         state.copyWith(paginationLoading: true);
@@ -48,29 +49,25 @@ abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T
         _isLastPage = _page > countOfPages;
         if (_items.isNotEmpty) {
           emit(
-            PaginationState(
+            PaginationState<T>(
               status: PaginationStatus.success,
               items: _items,
             ),
           );
         } else {
-          emit(
-            const PaginationState(status: PaginationStatus.empty),
-          );
+          emit(PaginationState<T>(status: PaginationStatus.empty));
         }
       }
     } catch (e) {
       if (_items.isNotEmpty) {
         emit(
-          const PaginationState(
+          PaginationState<T>(
             status: PaginationStatus.error,
             build: false,
           ),
         );
       } else {
-        emit(
-          const PaginationState(status: PaginationStatus.error),
-        );
+        emit(PaginationState<T>(status: PaginationStatus.error));
       }
     }
   }
