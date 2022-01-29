@@ -9,10 +9,10 @@ typedef ErrorBuilder = Widget Function(BuildContext);
 
 typedef PlaceholderBuilder = Widget Function(BuildContext, int);
 
-typedef ItemBuilder = Widget Function(BuildContext, int);
+typedef ItemBuilder<T> = Widget Function(BuildContext, int, List<T>);
 
 class Pagination<T> extends StatefulWidget {
-  final ItemBuilder itemBuilder;
+  final ItemBuilder<T> itemBuilder;
   final bool shrinkWrap;
   final Widget loader;
   final ErrorBuilder errorBuilder;
@@ -114,7 +114,7 @@ class _PaginationState<T> extends State<Pagination> {
                       ),
                   sliver: SliverGrid(
                     delegate: SliverChildBuilderDelegate(
-                      widget.itemBuilder,
+                      (c, i) => widget.itemBuilder(c, i, state.items),
                       childCount: state.items.length,
                       addAutomaticKeepAlives: false,
                       addRepaintBoundaries: false,
