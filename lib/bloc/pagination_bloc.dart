@@ -19,7 +19,7 @@ abstract class PaginationPages {
 
 abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T>>
     implements PaginationPages, PaginationResponseData<T> {
-  PaginationBloc() : super(const PaginationState<T>(status: PaginationStatus.initial)) {
+  PaginationBloc() : super(PaginationState<T>(status: PaginationStatus.initial)) {
     on<PaginationFetch>(_onPaginationFetch, transformer: droppable());
     on<PaginationRefresh>((event, emit) {
       _isLastPage = false;
