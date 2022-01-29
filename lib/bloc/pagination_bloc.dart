@@ -38,11 +38,12 @@ abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T
   Future<FutureOr<void>> _onPaginationFetch(_, Emitter<PaginationState> emit) async {
     try {
       if (_page == 1) {
+        _items = [];
         emit(const PaginationState(status: PaginationStatus.loading));
       }
       if (!_isLastPage) {
         state.copyWith(paginationLoading: true);
-        _items.addAll(await getItems());
+        _items.addAll(await getItems(_page));
         _page++;
         _isLastPage = _page > countOfPages;
         if (_items.isNotEmpty) {

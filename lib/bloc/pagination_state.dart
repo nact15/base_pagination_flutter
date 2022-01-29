@@ -24,10 +24,12 @@ class PaginationState<T> extends Equatable {
     PaginationStatus? status,
     bool? build,
     bool? paginationLoading,
+    List<T>? items,
   }) {
     return PaginationState(
       status: status ?? this.status,
       build: build ?? this.build,
+      items: items ?? this.items,
       paginationLoading: paginationLoading ?? false,
     );
   }
