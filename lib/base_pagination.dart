@@ -5,11 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/pagination_bloc.dart';
 
-typedef ErrorBuilder = Widget Function(BuildContext);
+typedef ErrorBuilder = Widget Function(BuildContext context);
 
-typedef PlaceholderBuilder = Widget Function(BuildContext, int);
+typedef PlaceholderBuilder = Widget Function(BuildContext context, int index);
 
-typedef ItemBuilder<T> = Widget Function(BuildContext, int, List<T>);
+typedef ItemBuilder<T> = Widget Function(T item);
 
 class Pagination<T> extends StatefulWidget {
   final ItemBuilder<T> itemBuilder;
@@ -114,7 +114,7 @@ class _PaginationState<T> extends State<Pagination> {
                       ),
                   sliver: SliverGrid(
                     delegate: SliverChildBuilderDelegate(
-                      (c, i) => widget.itemBuilder(c, i, state.items),
+                      (_, index) => widget.itemBuilder(state.items[index]),
                       childCount: state.items.length,
                       addAutomaticKeepAlives: false,
                       addRepaintBoundaries: false,

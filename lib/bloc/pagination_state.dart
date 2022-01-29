@@ -20,13 +20,13 @@ class PaginationState<T> extends Equatable {
     this.paginationLoading = false,
   });
 
-  PaginationState copyWith({
+  PaginationState<T> copyWith({
     PaginationStatus? status,
     bool? build,
     bool? paginationLoading,
     List<T>? items,
   }) {
-    return PaginationState(
+    return PaginationState<T>(
       status: status ?? this.status,
       build: build ?? this.build,
       items: items ?? this.items,
