@@ -35,5 +35,5 @@ class PaginationState<T> extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, build, paginationLoading];
+  List<Object?> get props => [status, build, paginationLoading, items];
 }

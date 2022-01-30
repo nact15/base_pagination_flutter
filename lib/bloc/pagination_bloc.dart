@@ -11,10 +11,12 @@ part 'pagination_state.dart';
 
 abstract class PaginationResponseData<T> {
   /// метод для запроса получения айтемов
+  /// В нем необходимо сетить countOfPages
   Future<List<T>> getItems(int page);
 }
 
 abstract class PaginationPages {
+  /// Количесвто страниц из запроса на пагинацию
   int get countOfPages;
 }
 
@@ -35,15 +37,15 @@ abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T
 
   int _page = 1;
 
-
   Future<FutureOr<void>> _onPaginationFetch(_, Emitter<PaginationState<T>> emit) async {
     try {
-      if (_page == 1) {
-        _items = [];
-        emit(state.copyWith(status: PaginationStatus.loading));
-      }
       if (!_isLastPage) {
-        emit(state.copyWith(paginationLoading: true));
+        if (_page == 1) {
+          _items = [];
+          emit(state.copyWith(status: PaginationStatus.loading));
+        } else {
+          emit(state.copyWith(paginationLoading: true));
+        }
         _items.addAll(await getItems(_page));
         _page++;
         _isLastPage = _page > countOfPages;

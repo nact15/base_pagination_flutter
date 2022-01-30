@@ -9,25 +9,43 @@ typedef ErrorBuilder = Widget Function(BuildContext context);
 
 typedef PlaceholderBuilder = Widget Function(BuildContext context, int index);
 
-typedef ItemBuilder<T> = Widget Function(T item);
+typedef ItemBuilder<T> = Widget Function(BuildContext context, T item);
 
 class Pagination<T> extends StatefulWidget {
   final ItemBuilder<T> itemBuilder;
-  final bool shrinkWrap;
+  /// Нижний лоадер пагинации
   final Widget loader;
+  /// Виджет ошибки
   final ErrorBuilder errorBuilder;
+  /// Виджет загрузки
+  /// Если customPlaceholder = false, то он перенимает параметры списка
+  /// айтемов, иначе он самостоятельный виджет
   final PlaceholderBuilder placeholderBuilder;
-  final ScrollController? scrollController;
+  final bool customPlaceholder;
+  final bool shrinkWrap;
   final ScrollPhysics physics;
+  /// Контроль кэша
   final double cacheExtent;
-  final Widget? emptyWidget;
+  /// Количество элементов по второй оси
   final int crossAxisCount;
   final double childAspectRatio;
+  /// Расстояние между элементами по второй оси
   final double crossAxisSpacing;
+  /// Расстояние между элементами по главной оси
   final double mainAxisSpacing;
+  /// Количество плейсхолдеров во время загрузки
   final int countOfPlaceholders;
-  final EdgeInsetsGeometry? padding;
+  /// Высота от низа экрана, при которой начинать подгрузку
   final int paginationOffset;
+  final bool addRepaintBoundaries;
+  final bool addAutomaticKeepAlives;
+  /// Отступ для списка
+  final EdgeInsetsGeometry? padding;
+  /// Виджет, отображаемый при пустой листе (default: SizedBox())
+  final Widget? emptyWidget;
+  final ScrollController? scrollController;
+  /// Для диалога на случай ошибки, произошедшей при уже непустом листе
+  final VoidCallback? errorCallBack;
 
   const Pagination({
     Key? key,
@@ -35,25 +53,29 @@ class Pagination<T> extends StatefulWidget {
     required this.loader,
     required this.errorBuilder,
     required this.placeholderBuilder,
+    this.customPlaceholder = false,
     this.shrinkWrap = false,
-    this.scrollController,
     this.physics = const AlwaysScrollableScrollPhysics(),
     this.cacheExtent = 500.0,
-    this.emptyWidget,
     this.crossAxisCount = 1,
     this.childAspectRatio = 1.0,
     this.crossAxisSpacing = 0.0,
     this.mainAxisSpacing = 0.0,
-    this.countOfPlaceholders = 3,
-    this.padding,
+    this.countOfPlaceholders = 1,
     this.paginationOffset = 100,
+    this.addRepaintBoundaries = false,
+    this.addAutomaticKeepAlives = false,
+    this.scrollController,
+    this.emptyWidget,
+    this.padding,
+    this.errorCallBack,
   }) : super(key: key);
 
   @override
   _PaginationState createState() => _PaginationState<T>();
 }
 
-class _PaginationState<T> extends State<Pagination> {
+class _PaginationState<T> extends State<Pagination<T>> {
   late ScrollController _scrollController;
   late ScrollPhysics _physics;
   late SliverGridDelegateWithFixedCrossAxisCount _gridDelegate;
@@ -73,11 +95,11 @@ class _PaginationState<T> extends State<Pagination> {
   }
 
   bool get _shouldFetch =>
-      _scrollController.offset == (_scrollController.position.maxScrollExtent - widget.paginationOffset);
+      _scrollController.offset >= (_scrollController.position.maxScrollExtent - widget.paginationOffset);
 
   void _scrollListener() {
     if (_shouldFetch) {
-      context.read<PaginationBloc>().add(PaginationFetch());
+      context.read<PaginationBloc<T>>().add(PaginationFetch());
     }
   }
 
@@ -85,7 +107,11 @@ class _PaginationState<T> extends State<Pagination> {
   Widget build(BuildContext context) {
     return BlocConsumer<PaginationBloc<T>, PaginationState<T>>(
       listenWhen: (_, state) => !state.build,
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state.status == PaginationStatus.error) {
+          widget.errorCallBack?.call();
+        }
+      },
       buildWhen: (_, state) => state.build,
       builder: (context, state) {
         switch (state.status) {
@@ -102,7 +128,7 @@ class _PaginationState<T> extends State<Pagination> {
           case PaginationStatus.success:
             return CustomScrollView(
               physics: _physics,
-              controller: _scrollController,
+              controller: _scrollController.hasClients ? null : _scrollController,
               cacheExtent: widget.cacheExtent,
               shrinkWrap: widget.shrinkWrap,
               slivers: [
@@ -114,10 +140,10 @@ class _PaginationState<T> extends State<Pagination> {
                       ),
                   sliver: SliverGrid(
                     delegate: SliverChildBuilderDelegate(
-                      (_, index) => widget.itemBuilder(state.items[index]),
+                      (context, index) => widget.itemBuilder(context, state.items[index]),
                       childCount: state.items.length,
-                      addAutomaticKeepAlives: false,
-                      addRepaintBoundaries: false,
+                      addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
+                      addRepaintBoundaries: widget.addRepaintBoundaries,
                     ),
                     gridDelegate: _gridDelegate,
                   ),
