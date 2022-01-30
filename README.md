@@ -5,23 +5,25 @@
 0. Небходимо создать класс, наследуемый от PaginationBloc и переопределить
 метод получения айтемов и геттер их количества
 ```dart
-class ExampleBloc extends PaginationBloc<T>
+class ExampleBloc extends PaginationBloc<T>(
+    ...
+    );
 ```
-**Где T - дженерик сущности **
-    
+**Где T - дженерик сущности **    
 0. Переопределить в нем методы
-              
 0. Создать провайдер:
-```dart 
+
+##! ДЖЕНЕРИКИ ОБЯЗАТЕЛЬНО НЕОБХОДИМО УКАЗЫВАТЬ!
+```dart
 BlocProvider<PaginationBloc<T>>(
-create: (_) => UserBloc()..add(PaginationFetch()),
-child: const PaginationScreen(),
-);```
-
-## ДЖЕНЕРИКИ ОБЯЗАТЕЛЬНО НЕОБХОДИМО УКАЗЫВАТЬ!
-
+                create: (_) => ExampleBloc()..add(PaginationFetch()),
+                child: const Pagination(),
+              );
+```
 0. Виджет для отображения пагинации должен иметь доступ к контексту,
 имеющего в зависимости блок. В дженерике та же сущность
-```Pagination<T>(
+```dart
+Pagination<T>(
     ...
-);>```
+);>
+```
