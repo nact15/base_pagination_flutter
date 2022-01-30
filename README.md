@@ -14,7 +14,7 @@ class ExampleBloc extends PaginationBloc<T>(
 2. Переопределить в нем методы
 3. Создать провайдер:
 
-## ДЖЕНЕРИКИ ОБЯЗАТЕЛЬНО НЕОБХОДИМО УКАЗЫВАТЬ !
+### Дженерики обязательны
 ```dart
 BlocProvider<PaginationBloc<T>>(
     create: (_) => ExampleBloc()..add(PaginationFetch()),
