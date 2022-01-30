@@ -17,7 +17,7 @@ class ExampleBloc extends PaginationBloc<T>(
 ```dart
 BlocProvider<PaginationBloc<T>>(
     create: (_) => ExampleBloc()..add(PaginationFetch()),
-    child: const Pagination(),
+    child: const ExampleScreen(),
 );
 ```
 4. Виджет для отображения пагинации должен иметь доступ к контексту,
