@@ -16,26 +16,32 @@ abstract class PaginationResponseData<T> {
 }
 
 abstract class PaginationPages {
-  /// Количесвто страниц из запроса на пагинацию
+  /// Количество страниц из запроса на пагинацию
+  // TODO: придумать что-то получше этого
   int get countOfPages;
 }
 
 abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T>>
     implements PaginationPages, PaginationResponseData<T> {
-  PaginationBloc() : super(PaginationState<T>(status: PaginationStatus.initial)) {
+  PaginationBloc({int? initialPage})
+      : _page = initialPage ?? 1,
+        _initialPage = initialPage,
+        super(
+          PaginationState<T>(status: PaginationStatus.initial),
+        ) {
     on<PaginationFetch>(_onPaginationFetch, transformer: droppable());
     on<PaginationRefresh>((event, emit) {
       _isLastPage = false;
-      _page = 1;
+      _page = _initialPage ?? 1;
       _items.clear();
       _onPaginationFetch(event, emit);
     }, transformer: droppable());
   }
 
-  bool _isLastPage = false;
   late List<T> _items;
-
-  int _page = 1;
+  late int _page;
+  late final int? _initialPage;
+  bool _isLastPage = false;
 
   Future<FutureOr<void>> _onPaginationFetch(_, Emitter<PaginationState<T>> emit) async {
     try {
@@ -61,6 +67,8 @@ abstract class PaginationBloc<T> extends Bloc<PaginationEvent, PaginationState<T
         }
       }
     } catch (e) {
+      // TODO: когда будет общий хэндлер для ошибок, то их можно будет здесь адекватно обработать
+      // а может и нет
       if (_items.isNotEmpty) {
         emit(
           state.copyWith(

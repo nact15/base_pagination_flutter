@@ -33,8 +33,8 @@ class PaginationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Pagination<UserEntity>(
-        errorBuilder: (context) => const Center(child: Text('error')),
-        placeholderBuilder: (context, _) => const Center(child: Text('loading')),
+        errorBuilder: (_) => const Center(child: Text('error')),
+        placeholderBuilder: (_) => const Center(child: Text('loading')),
         itemBuilder: (_, user) => Stack(
           fit: StackFit.expand,
           children: [

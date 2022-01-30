@@ -7,16 +7,19 @@ import 'bloc/pagination_bloc.dart';
 
 typedef ErrorBuilder = Widget Function(BuildContext context);
 
-typedef PlaceholderBuilder = Widget Function(BuildContext context, int index);
+typedef PlaceholderBuilder = Widget Function(BuildContext context);
 
 typedef ItemBuilder<T> = Widget Function(BuildContext context, T item);
 
 class Pagination<T> extends StatefulWidget {
   final ItemBuilder<T> itemBuilder;
+
   /// Нижний лоадер пагинации
   final Widget loader;
+
   /// Виджет ошибки
   final ErrorBuilder errorBuilder;
+
   /// Виджет загрузки
   /// Если customPlaceholder = false, то он перенимает параметры списка
   /// айтемов, иначе он самостоятельный виджет
@@ -24,26 +27,35 @@ class Pagination<T> extends StatefulWidget {
   final bool customPlaceholder;
   final bool shrinkWrap;
   final ScrollPhysics physics;
+
   /// Контроль кэша
   final double cacheExtent;
+
   /// Количество элементов по второй оси
   final int crossAxisCount;
   final double childAspectRatio;
+
   /// Расстояние между элементами по второй оси
   final double crossAxisSpacing;
+
   /// Расстояние между элементами по главной оси
   final double mainAxisSpacing;
+
   /// Количество плейсхолдеров во время загрузки
   final int countOfPlaceholders;
+
   /// Высота от низа экрана, при которой начинать подгрузку
   final int paginationOffset;
   final bool addRepaintBoundaries;
   final bool addAutomaticKeepAlives;
+
   /// Отступ для списка
   final EdgeInsetsGeometry? padding;
+
   /// Виджет, отображаемый при пустой листе (default: SizedBox())
   final Widget? emptyWidget;
   final ScrollController? scrollController;
+
   /// Для диалога на случай ошибки, произошедшей при уже непустом листе
   final VoidCallback? errorCallBack;
 
@@ -116,14 +128,16 @@ class _PaginationState<T> extends State<Pagination<T>> {
       builder: (context, state) {
         switch (state.status) {
           case PaginationStatus.loading:
-            return GridView.builder(
-              itemBuilder: widget.placeholderBuilder,
-              gridDelegate: _gridDelegate,
-              itemCount: widget.countOfPlaceholders,
-              shrinkWrap: widget.shrinkWrap,
-              padding: widget.padding,
-              physics: _physics,
-            );
+            return widget.customPlaceholder
+                ? widget.placeholderBuilder(context)
+                : GridView.builder(
+                    itemBuilder: (context, _) => widget.placeholderBuilder(context),
+                    gridDelegate: _gridDelegate,
+                    itemCount: widget.countOfPlaceholders,
+                    shrinkWrap: widget.shrinkWrap,
+                    padding: widget.padding,
+                    physics: _physics,
+                  );
 
           case PaginationStatus.success:
             return CustomScrollView(
