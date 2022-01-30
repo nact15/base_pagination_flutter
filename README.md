@@ -30,5 +30,5 @@ Pagination<T>(
 ```
 5. Для рефреша вызывать метод
 ```dart
-context.read<PaginationBloc<T>>.add(PaginationRefresh());
+context.read<PaginationBloc<T>>().add(PaginationRefresh());
 ```
